@@ -1,1 +1,1 @@
-IGNORE_FUNCTIONS = ['natsorted']
+IGNORE_FUNCTIONS = ['version_compare']
