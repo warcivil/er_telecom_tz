@@ -30,18 +30,19 @@ def html_handler(request):
     package_path = 'sorting_service_app.modules'
     package = importlib.import_module(package_path)
     for loader, module_name, is_pkg in pkgutil.walk_packages(package.__path__):
-        if not is_pkg:
-            module = importlib.import_module(f'{package_path}.{module_name}')
-            for attr_name, attr in vars(module).items():
-                if attr_name in sort_c.IGNORE_FUNCTIONS:
-                    continue
-                if callable(attr):
-                    function_list.append({
-                        'module_name': module_name,
-                        'function_name': attr_name,
-                        'description': attr.__doc__ or 'Нет описания',
-                        'source_code': getsource(attr),
-                    })
+        if is_pkg:
+            continue
+        module = importlib.import_module(f'{package_path}.{module_name}')
+        for attr_name, attr in vars(module).items():
+            if attr_name in sort_c.IGNORE_FUNCTIONS:
+                continue
+            if callable(attr):
+                function_list.append({
+                    'module_name': module_name,
+                    'function_name': attr_name,
+                    'description': attr.__doc__ or 'Нет описания',
+                    'source_code': getsource(attr),
+                })
 
     context = {'function_list': function_list}
     return render(request, 'function_list.html', context)
