@@ -16,11 +16,12 @@ def json_handler(request):
     function_name = json_data['function']
     try:
         module = importlib.import_module(f"sorting_service_app.modules.{module_name}")
-        function=getattr(module, function_name)
     except ImportError:
         return HttpResponseServerError("Unknown module NAME")
-    except AttributeError:
+    function = getattr(module, function_name, None)
+    if not function or function_name in sort_c.IGNORE_FUNCTIONS:
         return HttpResponseServerError("Unknown function NAME")
+
     result = function(json_data)
     return Response(status=status.HTTP_200_OK, data=result)
 
