@@ -1,5 +1,5 @@
 from sorting_service_app.utils.sorted_by_version import version_compare
-
+import rest_framework.exceptions as exceptions
 
 def sort_and_process_data(data):
     """
@@ -27,7 +27,7 @@ def sort_and_process_data(data):
             }
             data['data'] = sorted_data
         else:
-            raise ValueError('Invalid JSON format')
+            raise exceptions.ValidationError('Invalid JSON format')
     except Exception as e:
-        raise e
+        raise exceptions.APIException('Error in module')
     return data
