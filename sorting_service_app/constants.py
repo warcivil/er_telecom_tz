@@ -1,1 +1,0 @@
-IGNORE_FUNCTIONS = ['version_compare']

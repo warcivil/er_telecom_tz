@@ -1,5 +1,5 @@
-from sorting_service_app.utils.sorted_by_version import version_compare
-import rest_framework.exceptions as exceptions
+from sorting_service_app.utils.sorted_by_version import version_compare as u_version_compare
+import rest_framework.exceptions as u_exceptions
 
 def sort_and_process_data(data):
     """
@@ -23,11 +23,14 @@ def sort_and_process_data(data):
                     'ident': item['ident'],
                     'value': item['value'].strip().split()
                 }
-                for key, item in sorted(data['data'].items(), key=lambda x: version_compare(x[1]['ident']))
+                for key, item in sorted(data['data'].items(), key=lambda x: u_version_compare(x[1]['ident']))
             }
             data['data'] = sorted_data
         else:
-            raise exceptions.ValidationError('Invalid JSON format')
+            raise u_exceptions.ValidationError('Invalid JSON format')
     except Exception as e:
-        raise exceptions.APIException('Error in module')
+        raise u_exceptions.APIException('Error in module')
     return data
+
+
+

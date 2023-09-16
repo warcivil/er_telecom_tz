@@ -3,11 +3,10 @@ import pkgutil
 from inspect import getsource
 
 import rest_framework.status as status
-from django.http import HttpResponseServerError
+import rest_framework.exceptions as exceptions
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import sorting_service_app.constants as sort_c
 
 @api_view(['POST'])
 def json_handler(request):
@@ -17,10 +16,10 @@ def json_handler(request):
     try:
         module = importlib.import_module(f"sorting_service_app.modules.{module_name}")
     except ImportError:
-        return HttpResponseServerError("Unknown module NAME")
+        return exceptions.ValidationError("Unknown module NAME")
     function = getattr(module, function_name, None)
-    if not function or function_name in sort_c.IGNORE_FUNCTIONS:
-        return HttpResponseServerError("Unknown function NAME")
+    if not function or function_name.startswith('u_'):
+        raise exceptions.ValidationError("Unknown function NAME")
 
     result = function(json_data)
     return Response(status=status.HTTP_200_OK, data=result)
@@ -35,7 +34,7 @@ def html_handler(request):
             continue
         module = importlib.import_module(f'{package_path}.{module_name}')
         for attr_name, attr in vars(module).items():
-            if attr_name in sort_c.IGNORE_FUNCTIONS:
+            if attr_name.startswith('u_'):
                 continue
             if callable(attr):
                 function_list.append({
